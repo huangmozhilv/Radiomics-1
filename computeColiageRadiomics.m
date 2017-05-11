@@ -9,7 +9,7 @@ Coliage2 = computeImageRadiomics(Entropy2, m:M);
 
 function [Entropy1, Entropy2] = coliage3D(I)
 [~, A, E] = imgradient3(I);
-w = 15; %%discretization factor
+w = 30; %%discretization factor
 A = w*ceil(A/w-eps);
 A(A == -180) = 180;
 E = w*ceil(E/w-eps);
@@ -26,7 +26,7 @@ Entropy2 = zeros(size(I));
 nVoxel = numel(I);
 
 A = (A-min(angles1))/w;
-E = (E-min(angles2))/w;    
+E = (E-min(angles2))/w;
 [R, C, S] = meshgrid(1:size(I,1),1:size(I,2),1:size(I,3));
 for i = 1:nVoxel
     r = R(i);
@@ -58,19 +58,23 @@ for i = 1:nVoxel
     end
     q1 = A(startR:endR, startC:endC, startS:endS);
     q2 = E(startR:endR, startC:endC, startS:endS);
+    h = histcounts(q1);
+    M1 = h'*h;
+    h = histcounts(q2);
+    M2 = h'*h;
     nq = numel(q1);
-    q1 = reshape(q1, [nq 1]);
-    q2 = reshape(q2, [nq 1]);
-    temp1 = repmat(q1', [nq 1]);
-    temp1 = reshape(temp1, [numel(temp1) 1]);
-    temp2 = repmat(q1, [nq 1]);
-    sub = [temp1 temp2];
-    M1 = accumarray(sub, 1, [nAngles1 nAngles1]);
-    temp1 = repmat(q2', [nq 1]);
-    temp1 = reshape(temp1, [numel(temp1) 1]);
-    temp2 = repmat(q2, [nq 1]);
-    sub = [temp1 temp2];
-    M2 = accumarray(sub, 1, [nAngles2 nAngles2]);
+%     q1 = reshape(q1, [nq 1]);
+%     q2 = reshape(q2, [nq 1]);
+%     temp1 = repmat(q1', [nq 1]);
+%     temp1 = reshape(temp1, [numel(temp1) 1]);
+%     temp2 = repmat(q1, [nq 1]);
+%     sub = [temp1 temp2];
+%     M1 = accumarray(sub, 1, [nAngles1 nAngles1]);
+%     temp1 = repmat(q2', [nq 1]);
+%     temp1 = reshape(temp1, [numel(temp1) 1]);
+%     temp2 = repmat(q2, [nq 1]);
+%     sub = [temp1 temp2];
+%     M2 = accumarray(sub, 1, [nAngles2 nAngles2]);
     Entropy1(r,c,s) = entropy(M1/nq);
     Entropy2(r,c,s) = entropy(M2/nq);
 end
